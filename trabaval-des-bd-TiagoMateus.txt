@@ -1,0 +1,43 @@
+1) mongoimport --type csv -d imdbProject -c imdb --headerline --drop imdb_top_1000.csv
+2) use imdbProject, show collections, db.imdb.find().limit(5)
+3)
+    a) db.imdb.find().count() (1000 filmes)
+    b) db.imdb.find({},{Released_Year: 1, Series_Title : 1, IMDB_Rating : 1, No_of_Votes : 1}).sort({Released_Year: 1}).limit(10)
+    c) db.imdb.find({$or: [{Star1: 'Christian Bale'},{Star2: 'Christian Bale'},{Star3: 'Christian Bale'}, {Star4: 'Christian Bale'} ]})
+    d) db.imdb.find({Released_Year: {$gte : 2010, $lte : 2020}, IMDB_Rating : {$gt: 8.5} })
+    e)
+db.imdb.find().sort({No_of_Votes : -1}).limit(10).forEach(
+    function(p) {print("Filme: " + p.Series_Title + "Ano: " + p.Released_Year + " IMDB Rating: " + p.IMDB_Rating + " Nº de Votos: "
+                          + p.No_of_Votes + " Diretor: " + p.Director + " Principais Atores: " + p.Star1 + "/"
+                          + p.Star2 + "/" + p.Star3 + "/" + p.Star4)
+                        }
+                    )
+
+    f) db.imdb.find({Overview :  /World War II/i})  or db.imdb.find({Overview: {$regex: 'World War II'}})
+    g) db.imdb.find({}, {Series_Title: 1}).sort({IMDB_Rating : -1}).limit(1) -->  filme com rating maior
+       db.imdb.find({}, {Series_Title: 1}).sort({IMDB_Rating : 1}).limit(1) --> filme com rating menor
+       db.imdb.aggregate([{$group: {_id:null, avg_val:{$avg:"$IMDB_Rating"}}}])
+
+
+4)db.imdb.insertMany([
+    {
+        Series_Title:"The Hopefu",
+        Released_Year: 2024,
+        IMDB_Rating: 8,
+        Director:"Kyle Portbury",
+        Overview:"Aboard a steamship sailing across the Atlantic Ocean in 1874, widower John Andrews delights the restless minds of his two children with a tale of courage, hope, war, and true love that begins with the end of the world."
+    },
+    {
+        Series_Title:"Sasquatch Sunset",
+        Released_Year: 2024,
+        IMDB_Rating: 5.9,
+        Director:["David Zellner","Nathan Zellner"],
+        Overview:"A year in the life of a unique family. It captures the daily life of the Sasquatch with a level of detail and rigor that is simply unforgettable."
+    }
+])
+
+5) db.imdb.updateOne({_id:ObjectId('661eda7d2d49deb3c3eabb9e')}, {$set : {Series_Title : "Tiago Mateus", Runtime: "150 min" }} )
+6) db.imdb.deleteMany({IMDB_Rating : {$lt : 8}})
+7) mongodump -d imdbProject -o JSCESAE  
+ ( mongoexport --collection=imdb --db=imdbProject --out=imdbProject.txt --> testar para exportar o ficheiro)
+
